@@ -8,3 +8,4 @@ netflix
 privateinternetaccess
 retroarch
 sshd
+videomanager

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DEVICE=$1
+APP=$2
+
+# Ensure not already connected
+adb disconnect > /dev/null
+
+# Initiate ADB connection to device
+adb connect "$DEVICE":5555 > /dev/null
+
+# Find and disable apps matching the filter
+PKG_NAME=$(adb shell pm list packages | grep "$2" | cut -d ':' -f2)
+if [ -z $PKG_NAME ]; then
+  echo "Could not find a package name containing $APP"
+  adb disconnect > /dev/null
+  exit 1
+else
+  adb shell pm disable-user --user 0 "$PKG_NAME"
+fi
+
+# Disconnect adb
+adb disconnect > /dev/null
