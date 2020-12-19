@@ -63,3 +63,5 @@ while read pkg; do
   ./restore $TV "pkg"
 done <list.txt
 ```
+
+_Remove will not work with multiple packages as the device needs to reboot with each removal._
