@@ -49,3 +49,17 @@ Remove and package.
 ```sh
 ./remove $TV netflix
 ```
+
+### Package lists
+If you wish to **backup** or **restore** multiple packages, you can do so using the following command:
+```sh
+# backup
+while read pkg; do
+  ./backup $TV "pkg"
+done <list.txt
+
+# restore
+while read pkg; do
+  ./restore $TV "pkg"
+done <list.txt
+```
