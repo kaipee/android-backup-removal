@@ -1,0 +1,61 @@
+#!/bin/bash
+
+DEVICE=$1
+APP=$2
+
+# Ensure not already connected
+adb disconnect > /dev/null
+
+# Initiate ADB connection to device
+adb connect "$DEVICE":5555 > /dev/null
+
+## APK BACKUP
+printf "### APK BACKUP ###\n"
+
+# Find the package name
+PKG_NAME=$(adb shell pm list packages | grep "$2" | cut -d ':' -f2)
+if [ -z $PKG_NAME ]; then
+  echo "Could not find the package name: $2"
+  adb disconnect > /dev/null
+  exit 1
+else
+  echo "Package name is: $PKG_NAME"
+fi
+
+# Find the package path
+PKG_PATH=$(adb shell pm path "$PKG_NAME" | cut -d ':' -f2)
+if [ -z $PKG_PATH ]; then
+  echo "Could not find the path of: $PKG_NAME"
+  adb disconnect > /dev/null
+  exit 1
+else
+  echo "The package path is: $PKG_PATH"
+fi
+
+# Backup the apk
+echo "Backing up $PKG_PATH to $APP.apk"
+adb pull "$PKG_PATH" "$APP".apk
+if [ $? -eq 0 ]; then
+  echo "Success!"
+else
+  echo "Backup failed..."
+  adb disconnect > /dev/null
+  exit 1
+fi
+
+## APP DATA BACKUP
+printf "### APP DATA BACKUP ###\n"
+
+# Backup the app data
+echo "Backing up app data for $PKG_NAME to $APP.ab"
+adb backup -f "$APP".ab -apk -shared "PKG_NAME"
+if [ $? -eq 0 ]; then
+  echo "Success!"
+else
+  echo "App data backup failed..."
+  adb disconnect > /dev/null
+  exit 1
+fi
+
+# Disconnect adb
+adb disconnect > /dev/null

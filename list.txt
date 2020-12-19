@@ -1,0 +1,10 @@
+amazonvideo
+bbc
+button
+emby
+fx
+kodi
+netflix
+privateinternetaccess
+retroarch
+sshd
