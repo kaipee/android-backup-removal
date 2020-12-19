@@ -35,7 +35,7 @@ Find the package name using a filter.
 ./find $TV netflix
 ```
 
-Backup a package and it' data.
+Backup a package and its data.
 ```sh
 ./backup $TV netflix
 ```
@@ -45,23 +45,7 @@ Restore a package and its data.
 ./restore $TV netflix
 ```
 
-Remove and package.
+Remove a package.
 ```sh
 ./remove $TV netflix
 ```
-
-### Package lists
-If you wish to **backup** or **restore** multiple packages, you can do so using the following command:
-```sh
-# backup
-while read pkg; do
-  ./backup $TV "pkg"
-done <list.txt
-
-# restore
-while read pkg; do
-  ./restore $TV "pkg"
-done <list.txt
-```
-
-_Remove will not work with multiple packages as the device needs to reboot with each removal._
