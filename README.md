@@ -20,6 +20,15 @@ https://developers.google.com/cast/docs/android_tv_receiver/debugging#setting_up
     1. In the Preferences row, select Developer options, select USB debugging, and select On.
 1. Navigate back to the home screen. You must do this to apply the settings you just selected. The settings will persist unless you perform a factory reset.
 
+### Authorise your ADB client on the Android device
+
+Connect to your Android device via its IP (i.e. 192.168.0.10 - you can find this under Network Settings).
+```
+adb connect 192.168.0.10:555
+```
+
+The Android device will prompt to authorise this ADB client. Enable and click **OK**.
+
 ## Usage
 These commands will use Netflix as an example.
 
