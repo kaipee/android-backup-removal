@@ -23,22 +23,29 @@ https://developers.google.com/cast/docs/android_tv_receiver/debugging#setting_up
 ## Usage
 These commands will use Netflix as an example.
 
+Assuming your device is an Android TV on the same network as your ADB client, using IP address `192.168.0.10` (example).
+
+Set an environment variable.
+```sh
+export TV="192.168.0.10"
+```
+
 Find the package name using a filter.
 ```sh
-./find netflix
+./find $TV netflix
 ```
 
 Backup a package and it' data.
 ```sh
-./backup netflix
+./backup $TV netflix
 ```
 
 Restore a package and its data.
 ```sh
-./restore netflix
+./restore $TV netflix
 ```
 
 Remove and package.
 ```sh
-./remove netflix
+./remove $TV netflix
 ```
