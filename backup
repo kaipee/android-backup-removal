@@ -2,11 +2,6 @@
 
 DEVICE=$1
 APP=$2
-KEY_DOWN=
-
-KEY_RIGHT=
-
-KEY_OK=
 
 # Ensure not already connected
 adb disconnect > /dev/null
@@ -54,21 +49,11 @@ printf "### APP DATA BACKUP ###\n"
 # Backup the app data
 echo "Backing up app data for $PKG_NAME to $APP.ab"
 adb backup -f "$APP".ab -apk -shared "PKG_NAME"
-
-#adb shell sendevent /dev/input/event1 0 108 1  # Android KEY_DOWN event for DPAD_DOWN
-#adb shell sendevent /dev/input/event1 0 0 0
-#adb shell sendevent /dev/input/event1 0 108 0  # Android KEY_UP event for DPAD_DOWN
-#adb shell sendevent /dev/input/event1 0 0 0
-
-#adb shell sendevent /dev/input/event1 0 106 1  # Android KEY_DOWN event for DPAD_RIGHT
-#adb shell sendevent /dev/input/event1 0 0 0
-#adb shell sendevent /dev/input/event1 0 106 0  # Android KEY_UP event for DPAD_RIGHT
-#adb shell sendevent /dev/input/event1 0 0 0
-
-#adb shell sendevent /dev/input/event6 0 353 1  # Android KEY_DOWN event for OK
-#adb shell sendevent /dev/input/event6 0 0 0
-#adb shell sendevent /dev/input/event6 0 353 0  # Android KEY_UP event for OK
-#adb shell sendevent /dev/input/event6 0 0 0
+#adb shell input keyevent KEYCODE_TAB
+#adb shell input keyevent KEYCODE_TAB
+#adb shell input keyevent KEYCODE_BACK
+#adb shell input keyevent KEYCODE_TAB
+#adb shell input keyevent KEYCODE_ENTER
 
 if [ $? -eq 0 ]; then
   echo "Success!"
