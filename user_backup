@@ -17,7 +17,8 @@ printf "### WARNING !! THIS COULD TAKE A LONG TIME ###\n"
 echo "Finding all packages..."
 adb shell pm list packages -3 |  cut -d ':' -f2 > "$TMPFILE"
 if [ $? -eq 0 ]; then
-  echo "Done."
+  TOTAL=$(cat "$TMPFILE" | wc -l)
+  echo "Found $TOTAL packages.."
 else
   echo "There was a problem listing packages..."
   adb disconnect > /dev/null
@@ -25,8 +26,10 @@ else
 fi
 
 # Backup each package and its data
+COUNT=1
 while IFS= read -r PKG_NAME
 do
+  echo "Backing up package $COUNT of $TOTAL"
   if [ -z $PKG_NAME ]; then
     echo "Could not find the package name: $2"
     adb disconnect > /dev/null
@@ -97,7 +100,6 @@ do
   
   echo "Data backup complete. Exit code: $rc"
   
-  ### This line must be replaced since the former `if [ $?..` is no longer relevant
   if [ $rc -eq 0 ]; then
     echo "Success!"
   else
@@ -105,7 +107,9 @@ do
     adb disconnect > /dev/null
     exit 1
   fi
-  
-  # Disconnect adb
-  adb disconnect > /dev/null
+
+  ((COUNT=COUNT+1))
 done < "$TMPFILE"
+  
+ # Disconnect adb
+ adb disconnect > /dev/null
