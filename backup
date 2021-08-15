@@ -48,14 +48,35 @@ printf "### APP DATA BACKUP ###\n"
 
 # Backup the app data
 echo "Backing up app data for $PKG_NAME to $APP.ab"
-adb backup -f "$APP".ab -apk -shared "PKG_NAME"
-#adb shell input keyevent KEYCODE_TAB
-#adb shell input keyevent KEYCODE_TAB
-#adb shell input keyevent KEYCODE_BACK
-#adb shell input keyevent KEYCODE_TAB
-#adb shell input keyevent KEYCODE_ENTER
 
-if [ $? -eq 0 ]; then
+# Run backup in separate process
+adb backup -f "$APP".ab -apk -shared "PKG_NAME" &
+# Get backup PID
+pid=$!
+# Trap interrupt (ctrl+c) so we can stop the backup if script is stopped
+trap "kill $pid" INT
+
+echo "Data backup PID: $pid"
+echo "Accepting backup..."
+
+# Accept backup prompt, allowing for a short delay
+sleep 1
+adb shell input keyevent KEYCODE_TAB
+adb shell input keyevent KEYCODE_TAB
+# Sleep to allow for delay in keyboard to popping up
+sleep 1
+adb shell input keyevent KEYCODE_BACK
+adb shell input keyevent KEYCODE_TAB
+adb shell input keyevent KEYCODE_ENTER
+
+# Wait for backup to complete
+wait $pid
+rc=$?
+
+echo "Data backup complete. Exit code: $rc"
+
+### This line must be replaced since the former `if [ $?..` is no longer relevant
+if [ $rc -eq 0 ]; then
   echo "Success!"
 else
   echo "App data backup failed..."
