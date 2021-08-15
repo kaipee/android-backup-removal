@@ -33,10 +33,12 @@ else
 fi
 
 # Backup the apk
-echo "Backing up $PKG_PATH to $APP.apk"
-adb pull "$PKG_PATH" "$APP".apk
+printf "Backing up $PKG_PATH to $PKG_NAME.apk\n\n"
+sleep 3
+adb pull "$PKG_PATH" "$PKG_NAME".apk
 if [ $? -eq 0 ]; then
   echo "Success!"
+  sleep 3
 else
   echo "Backup failed..."
   adb disconnect > /dev/null
@@ -44,13 +46,20 @@ else
 fi
 
 ## APP DATA BACKUP
-printf "### APP DATA BACKUP ###\n"
+printf "\n### APP DATA BACKUP ###\n"
 
 # Backup the app data
-echo "Backing up app data for $PKG_NAME to $APP.ab"
+echo "Backing up app data for $PKG_NAME to $PKG_NAME.ab"
+
+printf "\n###########################################################\n"
+printf "# YOU MAY GET A NOTICE ABOUT DEPRECATION AND/OR UNLOCKING #\n"
+printf "# PLEASE IGNORE IT AND WAIT FOR THE OPERATION TO COMPLETE #\n"
+printf "###########################################################\n"
+
+sleep 5
 
 # Run backup in separate process
-adb backup -f "$APP".ab -apk -shared "PKG_NAME" &
+adb backup -f "$PKG_NAME".ab -apk -shared "$PKG_NAME" &
 # Get backup PID
 pid=$!
 # Trap interrupt (ctrl+c) so we can stop the backup if script is stopped
