@@ -1,0 +1,111 @@
+#!/bin/bash
+
+DEVICE=$1
+TMPFILE=$(mktemp)
+
+# Ensure not already connected
+adb disconnect > /dev/null
+
+# Initiate ADB connection to device
+adb connect "$DEVICE":5555 > /dev/null
+
+## SYSTEM FULL BACKUP
+printf "### BACKING UP ALL PACKAGES ###\n"
+printf "### WARNING !! THIS COULD TAKE A LONG TIME ###\n"
+ 
+# Find all packages
+echo "Finding all packages..."
+adb shell pm list packages |  cut -d ':' -f2 > "$TMPFILE"
+if [ $? -eq 0 ]; then
+  echo "Done."
+else
+  echo "There was a problem listing packages..."
+  adb disconnect > /dev/null
+  exit 1
+fi
+
+# Backup each package and its data
+while IFS= read -r PKG_NAME
+do
+  if [ -z $PKG_NAME ]; then
+    echo "Could not find the package name: $2"
+    adb disconnect > /dev/null
+    exit 1
+  else
+    echo "Package name is: $PKG_NAME"
+  fi
+  
+  # Find the package path
+  PKG_PATH=$(adb shell pm path "$PKG_NAME" | cut -d ':' -f2)
+  if [ -z $PKG_PATH ]; then
+    echo "Could not find the path of: $PKG_NAME"
+    adb disconnect > /dev/null
+    exit 1
+  else
+    echo "The package path is: $PKG_PATH"
+  fi
+  
+  # Backup the apk
+  printf "Backing up $PKG_PATH to $PKG_NAME.apk\n\n"
+  sleep 3
+  adb pull "$PKG_PATH" "$PKG_NAME".apk
+  if [ $? -eq 0 ]; then
+    echo "Success!"
+    sleep 3
+  else
+    echo "Backup failed..."
+    adb disconnect > /dev/null
+    exit 1
+  fi
+  
+  ## APP DATA BACKUP
+  printf "\n### APP DATA BACKUP ###\n"
+  
+  # Backup the app data
+  echo "Backing up app data for $PKG_NAME to $PKG_NAME.ab"
+  
+  printf "\n###########################################################\n"
+  printf "# YOU MAY GET A NOTICE ABOUT DEPRECATION AND/OR UNLOCKING #\n"
+  printf "# PLEASE IGNORE IT AND WAIT FOR THE OPERATION TO COMPLETE #\n"
+  printf "###########################################################\n"
+  
+  sleep 5
+  
+  # Run backup in separate process
+  adb backup -f "$PKG_NAME".ab -apk -shared "$PKG_NAME" &
+  # Get backup PID
+  pid=$!
+  # Trap interrupt (ctrl+c) so we can stop the backup if script is stopped
+  trap "kill $pid" INT
+  
+  echo "Data backup PID: $pid"
+  echo "Accepting backup..."
+  
+  # Accept backup prompt, allowing for a short delay
+  sleep 1
+  adb shell input keyevent KEYCODE_TAB
+  adb shell input keyevent KEYCODE_TAB
+  # Sleep to allow for delay in keyboard to popping up
+  sleep 1
+  adb shell input keyevent KEYCODE_BACK
+  adb shell input keyevent KEYCODE_TAB
+  adb shell input keyevent KEYCODE_ENTER
+  
+  # Wait for backup to complete
+  wait $pid
+  rc=$?
+  
+  echo "Data backup complete. Exit code: $rc"
+  
+  ### This line must be replaced since the former `if [ $?..` is no longer relevant
+  if [ $rc -eq 0 ]; then
+    echo "Success!"
+  else
+    echo "App data backup failed..."
+    adb disconnect > /dev/null
+    exit 1
+  fi
+  
+  # Disconnect adb
+  adb disconnect > /dev/null
+done < "$TMPFILE"
