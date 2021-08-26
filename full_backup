@@ -57,8 +57,6 @@ do
       sleep 3
     else
       echo "Backup failed..."
-      adb disconnect > /dev/null
-      exit 1
     fi
   done 10< <(adb shell pm path "$PKG_NAME" | cut -d ':' -f2)
   
@@ -105,8 +103,6 @@ do
     echo "Success!"
   else
     echo "App data backup failed..."
-    adb disconnect > /dev/null
-    exit 1
   fi
 done 10<"$TMPFILE"
 
