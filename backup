@@ -32,18 +32,21 @@ else
   echo "The package path is: $PKG_PATH"
 fi
 
-# Backup the apk
-printf "Backing up $PKG_PATH to $(pwd)/backups/$PKG_NAME.apk\n\n"
-sleep 3
-adb pull "$PKG_PATH" backups/"$PKG_NAME".apk
-if [ $? -eq 0 ]; then
-  echo "Success!"
+while IFS= read -r -u10 VERSION
+do
+  # Backup the apk
+  printf "Backing up $VERSION to $(pwd)/backups/$PKG_NAME.apk\n\n"
   sleep 3
-else
-  echo "Backup failed..."
-  adb disconnect > /dev/null
-  exit 1
-fi
+  adb pull "$VERSION" backups/"$PKG_NAME".apk
+  if [ $? -eq 0 ]; then
+    echo "Success!"
+    sleep 3
+  else
+    echo "Backup failed..."
+    adb disconnect > /dev/null
+    exit 1
+  fi
+done 10<"$PKG_PATH"
 
 ## APP DATA BACKUP
 printf "\n### APP DATA BACKUP ###\n"
@@ -59,7 +62,7 @@ printf "###########################################################\n"
 sleep 5
 
 # Run backup in separate process
-adb backup -f "$PKG_NAME".ab -apk -shared backups/"$PKG_NAME" &
+adb backup -f backups/"$PKG_NAME".ab -apk -shared "$PKG_NAME" &
 # Get backup PID
 pid=$!
 # Trap interrupt (ctrl+c) so we can stop the backup if script is stopped
