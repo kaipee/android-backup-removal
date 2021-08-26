@@ -34,7 +34,7 @@ do
   fi
 
   # Backup the apk
-  printf "Backing up $VERSION to $(pwd)/backups/$PKG_NAME.apk\n\n"
+  printf "Backing up $VERSION to $(pwd)/backups/$VERSION.apk\n\n"
   sleep 3
   adb pull "$VERSION" backups/"$PKG_NAME".apk
   if [ $? -eq 0 ]; then
