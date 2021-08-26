@@ -24,16 +24,16 @@ fi
 
 # Find the package path
 PKG_PATH=$(adb shell pm path "$PKG_NAME" | cut -d ':' -f2)
-if [ -z $PKG_PATH ]; then
-  echo "Could not find the path of: $PKG_NAME"
-  adb disconnect > /dev/null
-  exit 1
-else
-  echo "The package path is: $PKG_PATH"
-fi
-
 while IFS= read -r -u10 VERSION
 do
+  if [ -z $VERSION ]; then
+    echo "Could not find the path of: $PKG_NAME"
+    adb disconnect > /dev/null
+    exit 1
+  else
+    echo "The package path is: $VERSION"
+  fi
+
   # Backup the apk
   printf "Backing up $VERSION to $(pwd)/backups/$PKG_NAME.apk\n\n"
   sleep 3
