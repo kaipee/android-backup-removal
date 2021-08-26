@@ -33,10 +33,12 @@ do
     echo "The package path is: $VERSION"
   fi
 
+  PKG_VER_NAME=$(basename "$VERSION")
+
   # Backup the apk
-  printf "Backing up $VERSION to $(pwd)/backups/$VERSION.apk\n\n"
+  printf "Backing up $VERSION to $(pwd)/backups/$PKG_NAME.$PKG_VER_NAME\n\n"
   sleep 3
-  adb pull "$VERSION" backups/"$PKG_NAME".apk
+  adb pull "$VERSION" backups/"$PKG_NAME.$PKG_VER_NAME"
   if [ $? -eq 0 ]; then
     echo "Success!"
     sleep 3
