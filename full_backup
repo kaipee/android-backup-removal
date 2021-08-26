@@ -25,7 +25,7 @@ else
 fi
 
 # Backup each package and its data
-while IFS= read -r PKG_NAME
+while IFS= read -r -u10 PKG_NAME
 do
   if [ -z $PKG_NAME ]; then
     echo "Could not find the package name: $2"
@@ -97,7 +97,6 @@ do
   
   echo "Data backup complete. Exit code: $rc"
   
-  ### This line must be replaced since the former `if [ $?..` is no longer relevant
   if [ $rc -eq 0 ]; then
     echo "Success!"
   else
@@ -105,7 +104,7 @@ do
     adb disconnect > /dev/null
     exit 1
   fi
-  
-  # Disconnect adb
-  adb disconnect > /dev/null
-done < "$TMPFILE"
+done 10<"$TMPFILE"
+
+# Disconnect adb
+adb disconnect > /dev/null

@@ -27,7 +27,7 @@ fi
 
 # Backup each package and its data
 COUNT=1
-while IFS= read -r PKG_NAME
+while IFS= read -r -u10 PKG_NAME
 do
   echo "Backing up package $COUNT of $TOTAL"
   if [ -z $PKG_NAME ]; then
@@ -109,7 +109,7 @@ do
   fi
 
   ((COUNT=COUNT+1))
-done < "$TMPFILE"
+done 10<"$TMPFILE"
   
  # Disconnect adb
  adb disconnect > /dev/null
